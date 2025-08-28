@@ -1,0 +1,3 @@
+databaseChangeLog:
+  - include:
+      file: db/migration/V1__init_db.yaml
