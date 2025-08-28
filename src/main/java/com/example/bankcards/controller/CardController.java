@@ -20,6 +20,7 @@ public class CardController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<Page<CardDto>> getCards(@RequestParam(defaultValue = "0") int page,
                                                   @RequestParam(defaultValue = "10") int size,
                                                   @RequestParam(required = false) String status) {
@@ -33,6 +34,7 @@ public class CardController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<CardDto> getCardById(@PathVariable Long id) {
         return ResponseEntity.ok(cardService.getCardById(id));
     }
@@ -51,6 +53,7 @@ public class CardController {
     }
 
     @PostMapping("/{id}/block")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> blockCard(@PathVariable Long id) {
         cardService.blockCard(id);
         return ResponseEntity.ok().build();

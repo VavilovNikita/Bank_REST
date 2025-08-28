@@ -7,6 +7,7 @@ import com.example.bankcards.entity.User;
 import com.example.bankcards.exception.InsufficientFundsException;
 import com.example.bankcards.exception.ResourceNotFoundException;
 import com.example.bankcards.repository.CardRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class TransferService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('USER')")
     public void transfer(TransferDto transferDto) {
         Card fromCard = cardRepository.findById(transferDto.getFromCardId())
             .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + transferDto.getFromCardId()));

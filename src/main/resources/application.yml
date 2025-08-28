@@ -53,6 +53,7 @@ springdoc:
   default-produces-media-type: application/json
 
 jwt:
+  secret-key: YourSecretKey123
   secret: yourverylongandsecurejwtsecretkeyatleast256bitslonghere
   expiration: 3600000
 

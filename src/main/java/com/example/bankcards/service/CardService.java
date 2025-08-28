@@ -13,6 +13,7 @@ import com.example.bankcards.util.CardUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class CardService {
         this.cardUtil = cardUtil;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public Page<CardDto> getCards(int page, int size, String status) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
@@ -52,6 +54,7 @@ public class CardService {
         return cards.map(this::mapToDto);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public CardDto createCard(CardCreationDto creationDto) {
         Card card = new Card();
         card.setNumber(cardUtil.encrypt(creationDto.getNumber()));
@@ -63,12 +66,14 @@ public class CardService {
         return mapToDto(card);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public CardDto getCardById(Long id) {
         Card card = cardRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Card not found"));
         checkOwnership(card);
         return mapToDto(card);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public CardDto updateCard(Long id, CardUpdateDto updateDto) {
         Card card = cardRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Card not found"));
         card.setExpirationDate(updateDto.getExpirationDate());
@@ -79,11 +84,13 @@ public class CardService {
         return mapToDto(card);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteCard(Long id) {
         Card card = cardRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Card not found"));
         cardRepository.delete(card);
     }
 
+    @PreAuthorize("hasRole('USER')")
     public void blockCard(Long id) {
         Card card = cardRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Card not found"));
         checkOwnership(card);
@@ -91,6 +98,7 @@ public class CardService {
         cardRepository.save(card);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void activateCard(Long id) {
         Card card = cardRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Card not found"));
         card.setStatus(CardStatus.ACTIVE);

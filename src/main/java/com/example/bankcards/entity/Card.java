@@ -15,7 +15,7 @@ public class Card {
     private Long id;
 
     @Column(nullable = false)
-    private String number; // encrypted
+    private String number;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)

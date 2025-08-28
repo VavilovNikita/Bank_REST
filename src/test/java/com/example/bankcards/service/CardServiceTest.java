@@ -38,5 +38,4 @@ public class CardServiceTest {
         verify(cardRepository).delete(card);
     }
 
-    // Add more tests
 }

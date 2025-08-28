@@ -26,6 +26,4 @@ public class CardControllerTest {
         mockMvc.perform(get("/api/cards"))
             .andExpect(status().isOk());
     }
-
-    // Add more tests
 }

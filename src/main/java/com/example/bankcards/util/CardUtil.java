@@ -1,5 +1,6 @@
 package com.example.bankcards.util;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.Cipher;
@@ -9,14 +10,16 @@ import java.util.Base64;
 @Component
 public class CardUtil {
 
-    private static final String SECRET_KEY = "YourSecretKey123"; // Change this to a secure key
+    @Value("${jwt.secret-key}")
+    private String secretKey;
+
     private static final String ALGORITHM = "AES";
 
     public String encrypt(String data) {
         try {
-            SecretKeySpec secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), ALGORITHM);
+            SecretKeySpec secretKeySpec = new SecretKeySpec(this.secretKey.getBytes(), ALGORITHM);
             Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
             byte[] encrypted = cipher.doFinal(data.getBytes());
             return Base64.getEncoder().encodeToString(encrypted);
         } catch (Exception e) {
@@ -26,7 +29,7 @@ public class CardUtil {
 
     public String decrypt(String encryptedData) {
         try {
-            SecretKeySpec secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), ALGORITHM);
+            SecretKeySpec secretKey = new SecretKeySpec(this.secretKey.getBytes(), ALGORITHM);
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
             byte[] decrypted = cipher.doFinal(Base64.getDecoder().decode(encryptedData));
