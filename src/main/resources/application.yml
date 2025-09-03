@@ -57,6 +57,9 @@ jwt:
   secret: yourverylongandsecurejwtsecretkeyatleast256bitslonghere
   expiration: 3600000
 
+domain:
+  front: http://front:3000
+
 logging:
   level:
     root: INFO

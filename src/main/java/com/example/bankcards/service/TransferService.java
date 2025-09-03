@@ -7,6 +7,7 @@ import com.example.bankcards.entity.User;
 import com.example.bankcards.exception.InsufficientFundsException;
 import com.example.bankcards.exception.ResourceNotFoundException;
 import com.example.bankcards.repository.CardRepository;
+import com.example.bankcards.repository.UserRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,9 +21,11 @@ import java.util.Arrays;
 public class TransferService {
 
     private final CardRepository cardRepository;
+    private final UserRepository userRepository;
 
-    public TransferService(CardRepository cardRepository) {
+    public TransferService(CardRepository cardRepository, UserRepository userRepository) {
         this.cardRepository = cardRepository;
+        this.userRepository = userRepository;
     }
 
     @Transactional
@@ -34,7 +37,9 @@ public class TransferService {
             .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + transferDto.getToCardId()));
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) auth.getPrincipal();
+        String username = auth.getName();
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         // Проверка, что обе карты принадлежат текущему пользователю
         if (!fromCard.getOwner().getId().equals(user.getId()) || !toCard.getOwner().getId().equals(user.getId())) {

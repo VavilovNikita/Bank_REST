@@ -40,9 +40,10 @@ public class AuthService {
         user.setEmail(registrationDto.getEmail());
         Role userRole = roleRepository.findByName("USER").orElseThrow();
         user.setRoles(Set.of(userRole));
-        userRepository.save(user);
 
-        String token = jwtService.generateToken(user);
+        User savedUser = userRepository.save(user);
+
+        String token = jwtService.generateToken(savedUser);
         Map<String, String> response = new HashMap<>();
         response.put("token", token);
         return response;

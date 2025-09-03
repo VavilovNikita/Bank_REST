@@ -62,4 +62,14 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
+        this.roles = authorities.stream()
+            .map(authority -> {
+                Role role = new Role();
+                role.setName(authority.getAuthority().replace("ROLE_", ""));
+                return role;
+            })
+            .collect(Collectors.toSet());
+    }
 }
