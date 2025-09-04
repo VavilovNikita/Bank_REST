@@ -40,6 +40,7 @@ public class CardService {
      * @return page of card DTOs with masked card numbers
      * @throws ResourceNotFoundException if user not found
      */
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public Page<CardDto> getCards(int page, int size, String status) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -92,6 +93,7 @@ public class CardService {
      * @return card DTO with masked card number
      * @throws ResourceNotFoundException if card not found or user doesn't have access
      */
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public CardDto getCardById(Long id) {
         Card card = cardRepository.findById(id)

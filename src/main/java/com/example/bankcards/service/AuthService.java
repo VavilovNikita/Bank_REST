@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.naming.AuthenticationException;
 import java.util.HashMap;
@@ -40,6 +41,7 @@ public class AuthService {
      * @return map containing JWT token
      * @throws RuntimeException if role not found
      */
+    @Transactional
     public Map<String, String> register(UserRegistrationDto registrationDto) {
         User user = new User();
         user.setUsername(registrationDto.getUsername());
@@ -62,6 +64,7 @@ public class AuthService {
      * @return map containing JWT token
      * @throws AuthenticationException if authentication fails
      */
+    @Transactional
     public Map<String, String> login(UserLoginDto loginDto) {
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword())
