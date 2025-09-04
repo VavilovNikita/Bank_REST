@@ -27,7 +27,15 @@ public class TransferService {
         this.cardRepository = cardRepository;
         this.userRepository = userRepository;
     }
-
+    /**
+     * Transfers funds between two cards owned by the same user
+     *
+     * @param transferDto DTO containing transfer details
+     * @throws ResourceNotFoundException if cards not found
+     * @throws IllegalArgumentException if cards don't belong to current user
+     * @throws IllegalStateException if cards are not in ACTIVE status
+     * @throws InsufficientFundsException if insufficient funds on source card
+     */
     @Transactional
     @PreAuthorize("hasRole('USER')")
     public void transfer(TransferDto transferDto) {

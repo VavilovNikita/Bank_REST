@@ -27,17 +27,33 @@ public class UserService implements UserDetailsService {
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
-
+    /**
+     * Loads user by username for Spring Security authentication
+     *
+     * @param username the username to search for
+     * @return User entity
+     * @throws UsernameNotFoundException if user not found
+     */
     @Override
     public User loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
             .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
-
+    /**
+     * Retrieves all users in the system (admin only)
+     *
+     * @return list of user DTOs
+     */
     public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream().map(this::mapToDto).collect(Collectors.toList());
     }
-
+    /**
+     * Creates a new user with specified roles
+     *
+     * @param creationDto DTO containing user creation details
+     * @return created user DTO
+     * @throws RuntimeException if any specified role not found
+     */
     public UserDto createUser(UserCreationDto creationDto) {
         User user = new User();
         user.setUsername(creationDto.getUsername());

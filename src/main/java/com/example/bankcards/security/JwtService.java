@@ -22,30 +22,59 @@ public class JwtService {
 
     @Value("${jwt.expiration}")
     private long jwtExpiration;
-
+    /**
+     * Extracts username from JWT token
+     *
+     * @param token JWT token
+     * @return username from token subject
+     */
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
-
+    /**
+     * Extracts specific claim from JWT token
+     *
+     * @param <T> type of the claim
+     * @param token JWT token
+     * @param claimsResolver function to extract claim
+     * @return extracted claim value
+     */
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
-
+    /**
+     * Generates JWT token for user without extra claims
+     *
+     * @param userDetails user details
+     * @return JWT token string
+     */
     public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
-
+    /**
+     * Generates JWT token for user with extra claims
+     *
+     * @param extraClaims additional claims to include in token
+     * @param userDetails user details
+     * @return JWT token string
+     */
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder()
             .claims(extraClaims)
             .subject(userDetails.getUsername())
             .issuedAt(new Date(System.currentTimeMillis()))
             .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
-            .signWith(getSignInKey())
+            .signWith(getSignInKey(), Jwts.SIG.HS256)
             .compact();
     }
-
+    /**
+     * Validates JWT token against user details
+     *
+     * @param token JWT token to validate
+     * @param userDetails user details to validate against
+     * @return true if token is valid, false otherwise
+     */
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);

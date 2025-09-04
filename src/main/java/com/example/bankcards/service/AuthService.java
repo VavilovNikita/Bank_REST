@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.naming.AuthenticationException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -32,7 +33,13 @@ public class AuthService {
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
     }
-
+    /**
+     * Registers a new user with USER role
+     *
+     * @param registrationDto DTO containing user registration details
+     * @return map containing JWT token
+     * @throws RuntimeException if role not found
+     */
     public Map<String, String> register(UserRegistrationDto registrationDto) {
         User user = new User();
         user.setUsername(registrationDto.getUsername());
@@ -48,7 +55,13 @@ public class AuthService {
         response.put("token", token);
         return response;
     }
-
+    /**
+     * Authenticates user and generates JWT token
+     *
+     * @param loginDto DTO containing login credentials
+     * @return map containing JWT token
+     * @throws AuthenticationException if authentication fails
+     */
     public Map<String, String> login(UserLoginDto loginDto) {
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword())

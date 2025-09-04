@@ -31,7 +31,15 @@ public class CardService {
         this.userRepository = userRepository;
         this.cardUtil = cardUtil;
     }
-
+    /**
+     * Retrieves a paginated list of cards based on user role and optional status filter
+     *
+     * @param page the page number (zero-based)
+     * @param size the number of items per page
+     * @param status optional status filter (ACTIVE, BLOCKED, EXPIRED)
+     * @return page of card DTOs with masked card numbers
+     * @throws ResourceNotFoundException if user not found
+     */
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public Page<CardDto> getCards(int page, int size, String status) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -57,7 +65,13 @@ public class CardService {
         }
         return cards.map(this::mapToDto);
     }
-
+    /**
+     * Creates a new bank card for the specified user
+     *
+     * @param creationDto DTO containing card creation details
+     * @return created card DTO with masked card number
+     * @throws ResourceNotFoundException if user not found
+     */
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public CardDto createCard(CardCreationDto creationDto) {
@@ -71,7 +85,13 @@ public class CardService {
         cardRepository.save(card);
         return mapToDto(card);
     }
-
+    /**
+     * Retrieves a specific card by ID with ownership verification
+     *
+     * @param id the card ID
+     * @return card DTO with masked card number
+     * @throws ResourceNotFoundException if card not found or user doesn't have access
+     */
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public CardDto getCardById(Long id) {
         Card card = cardRepository.findById(id)
@@ -79,7 +99,14 @@ public class CardService {
         checkOwnership(card);
         return mapToDto(card);
     }
-
+    /**
+     * Updates card information (admin only)
+     *
+     * @param id the card ID to update
+     * @param updateDto DTO containing update details
+     * @return updated card DTO
+     * @throws ResourceNotFoundException if card not found
+     */
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public CardDto updateCard(Long id, CardUpdateDto updateDto) {
@@ -92,7 +119,12 @@ public class CardService {
         cardRepository.save(card);
         return mapToDto(card);
     }
-
+    /**
+     * Deletes a card (admin only)
+     *
+     * @param id the card ID to delete
+     * @throws ResourceNotFoundException if card not found
+     */
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteCard(Long id) {
@@ -100,7 +132,12 @@ public class CardService {
             .orElseThrow(() -> new ResourceNotFoundException("Card not found"));
         cardRepository.delete(card);
     }
-
+    /**
+     * Blocks a card (user can only block own cards)
+     *
+     * @param id the card ID to block
+     * @throws ResourceNotFoundException if card not found or user doesn't own the card
+     */
     @Transactional
     @PreAuthorize("hasRole('USER')")
     public void blockCard(Long id) {
@@ -110,7 +147,12 @@ public class CardService {
         card.setStatus(CardStatus.BLOCKED);
         cardRepository.save(card);
     }
-
+    /**
+     * Activates a card (admin only)
+     *
+     * @param id the card ID to activate
+     * @throws ResourceNotFoundException if card not found
+     */
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void activateCard(Long id) {
